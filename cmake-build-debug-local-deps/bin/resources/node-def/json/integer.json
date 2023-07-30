@@ -1,0 +1,23 @@
+{
+  "name" : "integer",
+  "socketType" : {
+    "input" : ["VAR"],
+    "output" : ["VAR"]
+  },
+  "isDynamicSocket" : false,
+  "isGroupNode" : false,
+  "defaultInput" : [0.0],
+  "defaultMagnitude" : [7],
+  "socketNames" : ["X"],
+  "enumNames" : [],
+  "nodeSize" : [140, 40],
+  "chartBounds" : [-5,5,-5,5],
+  "isOutputLabelVisible" : false,
+  "isDropDownVisible" : false,
+  "buttonNames" : [],
+  "colorDark" : [0.548853, 0.347838, 0.102783, 1.000000],
+  "colorLight" : [0.548853, 0.347838, 0.102783, 1.000000],
+  "adaptiveResolution" : true,
+  "chartType" : "NO_CHART",
+  "showInDrawer" : true
+}

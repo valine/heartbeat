@@ -1,0 +1,23 @@
+{
+  "name" : "neural",
+  "socketType" : {
+    "input" : ["VAR", "VAR", "CON", "CON", "CON", "ENUM", "ENUM"],
+    "output" : ["VAR", "CON", "CON"]
+  },
+  "isDynamicSocket" : false,
+  "isGroupNode" : true,
+  "defaultInput" : [0.0, 0.0, 0.05, -5, -1, 0, 0],
+  "defaultMagnitude" : [0, 0, 5, 6, 6, 1, 0, 0],
+  "socketNames" : ["Training Data", "X", "Step Size", "Window Start", "Window Width", "Optimizer", "Activation"],
+  "enumNames" : [[""],[""],[""],[""],[""],["RMSProp", "Adagrad", "Momentum", "Grad Decent"], ["TANH", "SIGMOID", "RELU"]],
+  "nodeSize" : [300, 100],
+  "chartBounds" : [0,99,-3,5],
+  "isOutputLabelVisible" : false,
+  "isDropDownVisible" : false,
+  "buttonNames" : ["Train", "Reset", "To String", "n-group"],
+  "colorDark" : [0.112719, 0.303202, 0.067817, 1.000000],
+  "colorLight" : [0.112719, 0.303202, 0.067817, 1.000000],
+  "adaptiveResolution" : true,
+  "chartType" : "LINE_1D_2X",
+  "showInDrawer" : true
+}

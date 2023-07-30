@@ -11,7 +11,9 @@
 #include "mesh/zobject.h"
 #include "ui/zchart.h"
 #include "ui/zscrollview.h"
+#include "ui/zlinechart.h"
 
+static const int MARGIN = 10;
 using namespace glm;
 using namespace std;
 
@@ -23,16 +25,46 @@ public:
     virtual ~MainViewController();
 private:
 
+    int mElapsedTime = 0;
     string getCurrentTime();
 
     void updateTime();
+    void updateWeather();
 
     ZLabel* mTimeLabel;
     std::thread mUpdaterThread;
+
     std::atomic<bool> m_running;
 
     string getCurrentDate();
 
-    ZLabel *m_dateLabel;
+    ZLabel *mDateLabel;
+
+    double getCPUTemperature();
+
+    ZLabel *mGPUTemp;
+
+    ZLabel *mOutdoorTemp;
+
+
+    vector<double> getGPUTemperatures();
+
+    double getOutdoorTemp();
+
+    vector<int> getVRAMUsage();
+
+    ZLabel *mGPUUsage;
+
+    string formatBytesToGB(int bytes);
+
+    float getUsedDiskSpace(const char *path);
+
+    float getTotalDiskSpace(const char *path);
+
+    ZLabel *mDiskSpaceLabel;
+
+    void updateDiskSpace();
+
+    ZLineChart* mVramChart;
 };
 

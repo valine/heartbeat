@@ -1,0 +1,1 @@
+cmd='/opt/clion-2023.1.5/bin/cmake/linux/x64/bin/cmake;-DCMAKE_INSTALL_PREFIX=/home/lukas/Desktop/zpath/install;-DBUILD_LIB=ON;-DCMAKE_INSTALL_PREFIX=/home/lukas/Desktop/zpath/buildlocal/;-GCodeBlocks - Unix Makefiles;<SOURCE_DIR><SOURCE_SUBDIR>'

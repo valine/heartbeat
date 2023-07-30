@@ -5,5 +5,6 @@ int main(int argc, char* argv[]) {
     /**
      * Main application loop
      */
-    ZApplication(new MainViewController(argv), "Sample Project", true);
+    ZApplication(new MainViewController(argv), "Heartbeat", true,
+                 1920, 1080,1);
 }

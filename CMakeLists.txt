@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 set(THIS_PROJECT heartbeat)
 project(${THIS_PROJECT})
 
+option(LOCAL_ZPATH "Local zpath" OFF)
+
 file(GLOB_RECURSE sources src/core/*.cpp src/core/*.c src/core/*.h src/gui/*.cpp src/gui/*.c src/gui/*.h)
 file(GLOB_RECURSE data resources/*)
 include_directories(include)
@@ -28,35 +30,60 @@ add_custom_command(TARGET ${THIS_PROJECT} PRE_BUILD
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
-#
-#   zpath
-#
-set(zpath_prefix      "${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath")
-set(zpath_install_dir "${zpath_prefix}")
-set(zpath_cmake_args  "-DBUILD_LIB=ON;-DCMAKE_INSTALL_PREFIX=${zpath_install_dir}")
-externalproject_add(zpath
-                    PREFIX         ${zpath_prefix}
-                    GIT_REPOSITORY https://github.com/valine/zpath.git
-                    UPDATE_COMMAND ""
-                    INSTALL_DIR    ${zpath_install_dir}
-                    CMAKE_ARGS     ${zpath_cmake_args}
-                    GIT_TAG develop
-                    )
+
+
+if(LOCAL_ZPATH)
+
+    set(zpath_prefix      "/home/lukas/Desktop/zpath")
+    set(zpath_install_dir "${zpath_prefix}/buildlocal/")
+    set(zpath_cmake_args  "-DBUILD_LIB=ON;-DCMAKE_INSTALL_PREFIX=${zpath_install_dir}")
+
+    # Add the library project
+    ExternalProject_Add(zpath
+            SOURCE_DIR "/home/lukas/Desktop/zpath"
+            BINARY_DIR "/home/lukas/Desktop/zpath/buildlocal"  # or another directory where you want the library to be built
+            CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/home/lukas/Desktop/zpath/install  # or another install directory
+            INSTALL_COMMAND ""
+            CMAKE_ARGS     ${zpath_cmake_args}
+            BUILD_ALWAYS 1  # Add this line
+            )
+
+    set(ZDEP "$ENV{HOME}/Desktop/zpath")
+else()
+
+    #
+    #   zpath
+    #
+    set(zpath_prefix      "${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath")
+    set(zpath_install_dir "${zpath_prefix}")
+    set(zpath_cmake_args  "-DBUILD_LIB=ON;-DCMAKE_INSTALL_PREFIX=${zpath_install_dir}")
+    externalproject_add(zpath
+            PREFIX         ${zpath_prefix}
+            GIT_REPOSITORY https://github.com/valine/zpath.git
+            INSTALL_DIR    ${zpath_install_dir}
+            CMAKE_ARGS     ${zpath_cmake_args}
+            GIT_TAG develop
+
+            )
+
+    set(ZDEP "${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/")
+endif()
+
+# Add this line to find CURL package
+find_package(CURL REQUIRED)
+target_link_libraries(heartbeat ${CURL_LIBRARIES})
+target_include_directories(heartbeat PRIVATE ${CURL_INCLUDE_DIRS})
 
 add_dependencies(${THIS_PROJECT} zpath)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/lib)
+include_directories(${ZDEP}/include)
+include_directories(${ZDEP}/deps/zdep/src/zdep/headers/assimp/include)
+link_directories(${ZDEP}/deps/zdep/src/zdep/linux/assimp)
+include_directories(${ZDEP}/deps/zdep/src/zdep/headers/glfw/include)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/zdep/src/zdep/headers/assimp/include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}deps/zpath/src/zpath/deps/zdep/src/zdep/linux/assimp)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/zdep/src/zdep/headers/glfw/include)
-
-
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/glfw/lib)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/zdep/src/zdep/headers/glm)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/zdep/src/zdep/headers/freetype/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/deps/png/include)
+link_directories(${ZDEP}/deps/glfw/lib)
+include_directories(${ZDEP}/deps/zdep/src/zdep/headers/glm)
+include_directories(${ZDEP}/deps/zdep/src/zdep/headers/freetype/include)
+include_directories(${ZDEP}/deps/png/include)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package (OpenGL REQUIRED)
@@ -74,8 +101,6 @@ if(UNIX AND NOT APPLE)
     set(LINUX TRUE)
     message(STATUS "Linux detected")
 endif()
-
-set(ZDEP "${CMAKE_CURRENT_SOURCE_DIR}/deps/zpath/src/zpath/")
 
 if (APPLE)
     if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
