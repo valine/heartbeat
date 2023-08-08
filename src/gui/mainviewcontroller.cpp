@@ -105,6 +105,16 @@ void MainViewController::onCreate() {
     mDiskSpaceLabel->setTextColor(gold);
     mDiskSpaceLabel->setYOffset(420);
 
+    mIPLabel = new ZLabel("Pi IPs Here", ll);
+    mIPLabel->setTextSize(30);
+    mIPLabel->setMaxHeight(70);
+    mIPLabel->setTextColor(white);
+    mIPLabel->setYOffset(420);
+    mIPLabel->setOnClick([this](ZView* sender) {
+        string ip = getPIIpds();
+        mIPLabel->setText(ip);
+    });
+
     mVramChart = new ZLineChart(ZView::fillParent, 300, ll);
     mVramChart->setMargin(vec4(0, 0, 0, 50));
     mVramChart->setBounds(vec4(0,5,5,0));
@@ -278,6 +288,23 @@ std::vector<double> MainViewController::getGPUTemperatures() {
     return temperatures;
 }
 
+std::string MainViewController::getPIIpds() {
+    std::string result;
+    char buffer[128];
+    const char* cmd = "/home/lukas/bin/pilan";
+
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+
+    while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
+        result += buffer;
+    }
+
+    return result;
+}
+
 std::string MainViewController::formatBytesToGB(int megabytes) {
     double gigabytes = megabytes / 1024.0;
     std::stringstream ss;
@@ -300,6 +327,9 @@ void MainViewController::updateTime() {
         if (mElapsedTime % (min15) == min15 - 1) {
             double temp = getOutdoorTemp();
             mOutdoorTemp->setText(to_string((int) temp) + "°");
+
+            string piIpds = getPIIpds();
+            mIPLabel->setText(piIpds);
         }
         getRootView()->invalidate();
         mElapsedTime++;

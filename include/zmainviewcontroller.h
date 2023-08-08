@@ -66,5 +66,8 @@ private:
     void updateDiskSpace();
 
     ZLineChart* mVramChart;
+    ZLabel *mIPLabel;
+
+    string getPIIpds();
 };
 
