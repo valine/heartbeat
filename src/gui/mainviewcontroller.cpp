@@ -81,7 +81,7 @@ void MainViewController::onCreate() {
     mDateLabel->setTextSize(30);
     mDateLabel->setMaxHeight(70);
     mDateLabel->setYOffset(30);
-    mDateLabel->setXOffset(mTimeLabel->getEndPoint().first);
+    mDateLabel->setXOffset(mTimeLabel->getEndPoint().first + MARGIN);
     mDateLabel->setTextColor(gold);
 
     mOutdoorTemp = new ZLabel("t70°", ll);
@@ -135,6 +135,7 @@ void MainViewController::onCreate() {
     mVramChart->resetZoom();
     mVramChart->resetTmpTransform();
     mVramChart->invalidateData();
+    mVramChart->setVisibility(false);
 
     ll->refreshMargins();
     updateDiskSpace();
@@ -145,7 +146,50 @@ void MainViewController::onCreate() {
 //    }
     ll->setConsumeClicks(false);
     ll->setDraggable(false);
+
+    setBackgroundColor(black);
+    root->setBackgroundColor(black);
 }
+
+
+void MainViewController::updateTime() {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    while (m_running) {
+        mTimeLabel->setText(getCurrentTime());
+
+        mDateLabel->setXOffset(mTimeLabel->getEndPoint().first + MARGIN);
+       // getRootView()->onWindowChange(getWindowWidth(), getWindowHeight());
+        mDateLabel->computeBounds();
+        mDateLabel->setText(getCurrentDate());
+
+        mDateLabel->invalidate();
+        mTimeLabel->invalidate();
+
+        int min15 = 15 * 60;
+        if (mElapsedTime % (min15) == min15 - 1) {
+            double temp = getOutdoorTemp();
+            mOutdoorTemp->setText(to_string((int) temp) + "°");
+
+            string piIpds = getPIIpds();
+            mIPLabel->setText(piIpds);
+        }
+        getRootView()->invalidate();
+        mElapsedTime++;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        // Update gpu usage
+        std::vector<int> usages = getVRAMUsage();
+
+        std::string usageStr = "";
+        for (int usage : usages) {
+            usageStr += formatBytesToGB(usage) + "\n";
+        }
+
+        mGPUUsage->setText(usageStr);
+        updateDiskSpace();
+    }
+}
+
 
 void MainViewController::updateDiskSpace() {// Update disk space label
     float currentDiskSpace = getUsedDiskSpace("/");
@@ -310,40 +354,4 @@ std::string MainViewController::formatBytesToGB(int megabytes) {
     std::stringstream ss;
     ss << std::fixed << std::setprecision(2) << gigabytes;
     return ss.str() + " GB";
-}
-
-void MainViewController::updateTime() {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    while (m_running) {
-        mTimeLabel->setText(getCurrentTime());
-
-        mDateLabel->setXOffset(mTimeLabel->getEndPoint().first + MARGIN);
-       // getRootView()->onWindowChange(getWindowWidth(), getWindowHeight());
-        mDateLabel->setText(getCurrentDate());
-
-        mTimeLabel->invalidate();
-
-        int min15 = 15 * 60;
-        if (mElapsedTime % (min15) == min15 - 1) {
-            double temp = getOutdoorTemp();
-            mOutdoorTemp->setText(to_string((int) temp) + "°");
-
-            string piIpds = getPIIpds();
-            mIPLabel->setText(piIpds);
-        }
-        getRootView()->invalidate();
-        mElapsedTime++;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
-        // Update gpu usage
-        std::vector<int> usages = getVRAMUsage();
-
-        std::string usageStr = "";
-        for (int usage : usages) {
-            usageStr += formatBytesToGB(usage) + "\n";
-        }
-
-        mGPUUsage->setText(usageStr);
-        updateDiskSpace();
-    }
 }
