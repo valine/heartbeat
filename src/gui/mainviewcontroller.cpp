@@ -95,9 +95,9 @@ void MainViewController::onCreate() {
 
     mGPUUsage = new ZLabel("VRAM", ll);
     mGPUUsage->setTextSize(60);
-    mGPUUsage->setMaxWidth(300);
-    mGPUUsage->setMaxHeight(170);
-    mGPUUsage->setTextColor(vec4(0.800657, 0.148515, 0.040476, 1.000000));
+    mGPUUsage->setMaxWidth(359);
+    mGPUUsage->setMaxHeight(250);
+    mGPUUsage->setTextColor(vec4(0.063552, 0.476991, 0.012858, 1.000000));
 
     mDiskSpaceLabel = new ZLabel("", ll);
     mDiskSpaceLabel->setTextSize(30);
@@ -181,12 +181,19 @@ void MainViewController::updateTime() {
         std::vector<int> usages = getVRAMUsage();
 
         std::string usageStr = "";
+        int cudaIndex = 0;
         for (int usage : usages) {
+            string indexString = to_string(cudaIndex);
             usageStr += formatBytesToGB(usage) + "\n";
+            cudaIndex++;
         }
 
         mGPUUsage->setText(usageStr);
         updateDiskSpace();
+
+        invalidate();
+        mTimeLabel->onWindowChange(getWindowWidth(), getWindowHeight());
+        glfwPostEmptyEvent();
     }
 }
 
